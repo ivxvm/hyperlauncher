@@ -1,12 +1,12 @@
 import dearpygui.dearpygui as dpg
 
 import settings
-from main_screen import render_main_screen
+import main_screen
 
 
 def handle_login_click():
     dpg.delete_item("tag:login")
-    render_main_screen()
+    main_screen.render_main_screen()
 
 
 def render_login_screen():

@@ -2,28 +2,29 @@ import dearpygui.dearpygui as dpg
 import webbrowser
 
 from constants import *
-from login_screen import render_login_screen
 
 import settings
 import remote_config
 import modpack
+import dpg_stdout_redirect
+import login_screen
 
 
 def handle_selected_modpack_change():
     selected_modpack = dpg.get_value("tag:main/selected_modpack")
-    settings.setsave("selected_modpack", str(selected_modpack.encode('utf-8')))
+    settings.settings_file.setsave("selected_modpack", str(selected_modpack.encode('utf-8')))
     modpack_config = remote_config.modpack_config_by_title[selected_modpack]
     dpg.set_value("tag:main/description", modpack_config["description"])
 
 
 def handle_nickname_change():
-    settings.setsave("nickname", str(
+    settings.settings_file.setsave("nickname", str(
         dpg.get_value("tag:main/nickname").encode('utf-8')))
 
 
 def handle_logout():
     dpg.delete_item("tag:main")
-    render_login_screen()
+    login_screen.render_login_screen()
 
 
 def handle_play():
@@ -33,7 +34,6 @@ def handle_play():
 
 
 def render_main_screen():
-    global log_window_id
     with dpg.window(tag="tag:main"):
         dpg.set_primary_window("tag:main", True)
 
@@ -80,7 +80,7 @@ def render_main_screen():
                                   max_clamped=True)
 
             with dpg.collapsing_header(label="Лог", tag="tag:main/log_header", default_open=False):
-                log_window_id = dpg.add_child_window(height=200)
+                dpg_stdout_redirect.log_window_id = dpg.add_child_window(height=200)
 
         # with dpg.item_handler_registry() as click_handlers:
         #     dpg.add_item_hover_handler(callback=handle_headers_resize)
