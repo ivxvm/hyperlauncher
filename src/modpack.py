@@ -82,7 +82,7 @@ def start_modpack(cfg):
         cfg["client_version"].replace("-", "-forge-"),
         modpack_directory,
         {
-            "username": dpg.get_value("tag:main/nickname"),
+            "username": dpg.get_value("tag:main/username"),
             "uid": uuid.uuid4().hex,
             "token": "",
             "jvmArguments": [

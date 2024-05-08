@@ -4,9 +4,14 @@ LAUCNHER_CONFIG_FILE = "~/hyperlauncher.conf"
 MODPACKS_CONFIG_URL = "https://raw.githubusercontent.com/ivxvm/hypercube-modpacks/main/hypercube-modpacks.json"
 DISCORD_URL = "https://discord.com/invite/4dv9qGebhW"
 GITHUB_URL = "https://github.com/ivxvm?tab=repositories"
+AUTH_SERVER_URL = "https://localhost:8443"
+IS_LOCALHOST = "localhost" in AUTH_SERVER_URL
 
-DEFAULT_WINDOW_WIDTH = 1024
-DEFAULT_WINDOW_HEIGHT = 768
+WINDOW_WIDTH = 1024
+WINDOW_HEIGHT = 768
+LOGO_WIDTH = 400
+LOGO_HEIGHT = 400
+LOGO_OFFSET_TOP = 40
 MODPACKS_LISTBOX_WIDTH = 300
 
 DETACHED_PROCESS = 0x00000008
