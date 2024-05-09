@@ -7,6 +7,9 @@ GITHUB_URL = "https://github.com/ivxvm?tab=repositories"
 AUTH_SERVER_URL = "https://localhost:8443"
 IS_LOCALHOST = "localhost" in AUTH_SERVER_URL
 
+DEFAULT_MIN_RAM = 4096
+DEFAULT_MAX_RAM = 8192
+
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 768
 LOGO_WIDTH = 400
