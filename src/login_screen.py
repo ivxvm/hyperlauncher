@@ -31,8 +31,10 @@ def handle_login_click():
                              verify=not constants.IS_LOCALHOST)
     status_code = response.status_code
     if status_code == 200:
-        settings.set_token(response.text)
         settings.set_username(username)
+        settings.reload_user_settings()
+        settings.set_token(response.text)
+        dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
         dpg.delete_item("tag:login")
         main_screen.render_main_screen()
     else:
@@ -53,6 +55,7 @@ def handle_register_click():
 
 
 def render_login_screen():
+    dpg.set_viewport_title(f"Hyperlauncher")
     with dpg.group(tag="tag:login", parent="tag:window"):
         dpg.add_image("tag:logo",
                       pos=[constants.WINDOW_WIDTH / 2 - constants.LOGO_WIDTH / 2,
@@ -63,7 +66,7 @@ def render_login_screen():
         dpg.add_input_text(tag="tag:login/username",
                            width=constants.LOGO_WIDTH - LABEL_WIDTH,
                            pos=[x + LABEL_WIDTH, y],
-                           default_value=settings.saved_username,
+                           default_value=settings.username,
                            on_enter=True,
                            callback=lambda: dpg.focus_item("tag:login/password"))
         y += ROW_OFFSET_Y

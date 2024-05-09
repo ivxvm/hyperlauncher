@@ -3,9 +3,9 @@ import subprocess
 import uuid
 import git
 import minecraft_launcher_lib
-import dearpygui.dearpygui as dpg
 
 import constants
+import settings
 
 ###############################################################################
 
@@ -48,9 +48,9 @@ PROGRESS_CB = {
 
 
 def ensure_modpack_installed(cfg):
-    modpack_directory = os.path.expanduser(cfg["directory_path"])
+    modpack_folder = os.path.expanduser(cfg["directory_path"])
     current_version_file = os.path.join(
-        modpack_directory, "client-version.txt")
+        modpack_folder, "client-version.txt")
     should_download_client = True
     if os.path.isfile(current_version_file):
         with open(current_version_file, 'r') as file:
@@ -58,31 +58,36 @@ def ensure_modpack_installed(cfg):
             if current_client_version == cfg["client_version"]:
                 should_download_client = False
     if should_download_client:
+        print(f'Installing minecraft client {cfg["client_version"]}')
         minecraft_launcher_lib.forge.install_forge_version(
-            cfg["client_version"], modpack_directory, callback=PROGRESS_CB)
+            cfg["client_version"], modpack_folder, callback=PROGRESS_CB)
         with open(current_version_file, 'w') as file:
             file.write(cfg["client_version"])
-    repo = git.Repo.init(modpack_directory)
-    origin = None
+    repo = git.Repo.init(modpack_folder)
+    # origin = None
     if len(repo.remotes) == 0:
-        origin = repo.create_remote("origin", cfg["repository_url"])
-    else:
-        origin = repo.remotes[0]
-    for fetch_info in origin.fetch(progress=CustomRemoteProgress()):
-        print("Updated %s to %s" % (fetch_info.ref, fetch_info.commit))
-    repo.create_head("main", origin.refs.main)
-    repo.heads.main.set_tracking_branch(origin.refs.main)
-    repo.heads.main.checkout()
+        # origin =
+        repo.create_remote("origin", cfg["repository_url"])
+    # else:
+    #     origin = repo.remotes[0]
+    # for fetch_info in origin.fetch(progress=CustomRemoteProgress()):
+    #     print("Updated %s to %s" % (fetch_info.ref, fetch_info.commit))
+    # repo.create_head("main", origin.refs.main)
+    # repo.heads.main.set_tracking_branch(origin.refs.main)
+    # repo.heads.main.checkout()
+    print("Syncing modpack files")
+    repo.git.pull("origin", "main", "--rebase", "--autostash")  #
     # repo.head.reset(index=True, working_tree=True)
 
 
 def start_modpack(cfg):
+    print("Starting modpack")
     modpack_directory = os.path.expanduser(cfg["directory_path"])
     minecraft_command = minecraft_launcher_lib.command.get_minecraft_command(
         cfg["client_version"].replace("-", "-forge-"),
         modpack_directory,
         {
-            "username": dpg.get_value("tag:main/username"),
+            "username": settings.username,
             "uid": uuid.uuid4().hex,
             "token": "",
             "jvmArguments": [

@@ -66,7 +66,7 @@ def render_register_screen():
         dpg.add_input_text(tag="tag:register/username",
                            width=constants.LOGO_WIDTH - LABEL_WIDTH,
                            pos=[x + LABEL_WIDTH, y],
-                           default_value=settings.saved_username,
+                           default_value=settings.username,
                            on_enter=True,
                            callback=lambda: dpg.focus_item("tag:register/password"))
         y += ROW_OFFSET_Y

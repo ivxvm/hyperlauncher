@@ -69,10 +69,12 @@ def main():
     dpg.set_primary_window("tag:window", True)
 
     login_response = requests.post(f'{AUTH_SERVER_URL}/login',
-                                   json={"username": settings.saved_username,
-                                         "token": settings.saved_token},
+                                   json={"username": settings.username,
+                                         "token": settings.token},
                                    verify=not IS_LOCALHOST)
     if login_response.status_code == 200:
+        dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
+        settings.reload_user_settings()
         settings.set_token(login_response.text)
         render_main_screen()
     else:
