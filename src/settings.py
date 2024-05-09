@@ -7,6 +7,7 @@ import constants
 
 ###############################################################################
 
+
 settings_file = EasySettings(os.path.expanduser(constants.LAUCNHER_CONFIG_FILE))
 
 
@@ -17,19 +18,26 @@ def save_utf8_value(key, value):
 def load_utf8_value(key):
     return ast.literal_eval(settings_file.get(key, "b''")).decode("utf-8")
 
+
+def global_setter(name):
+    def set_value(value):
+        globals()[name] = value
+        save_utf8_value(name, value)
+    return set_value
+
+
 ###############################################################################
 
 
 username = load_utf8_value("username")
+working_folder = load_utf8_value("working_folder") or "~"
 
-
-def set_username(value):
-    global username
-    username = value
-    save_utf8_value("username", value)
+set_username = global_setter("username")
+set_working_folder = global_setter("working_folder")
 
 
 ###############################################################################
+
 
 selected_modpack = None
 token = None
@@ -57,6 +65,7 @@ set_skin_path = user_scoped_setter("skin_path")
 
 ###############################################################################
 
+
 min_ram = None
 max_ram = None
 
@@ -80,6 +89,7 @@ set_max_ram = modpack_scoped_setter("max_ram")
 
 
 ###############################################################################
+
 
 reload_user_settings()
 reload_modpack_settings()

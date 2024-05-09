@@ -1,4 +1,5 @@
 import os
+import re
 import webbrowser
 import dearpygui.dearpygui as dpg
 
@@ -11,9 +12,17 @@ import dpg_stdout_redirect
 import login_screen
 
 SETTINGS_INDENT = 28
-SETTINGS_INPUT_WIDTH = 550
+SETTINGS_INPUT_WIDTH = 570
+
 PROFILE_SETTINGS_LABEL_WIDTH = 128
+GENERAL_SETTINGS_LABEL_WIDTH = 192
 GAME_SETTINGS_LABEL_WIDTH = 256
+
+FILE_DIALOG_WIDTH = 880
+FILE_DIALOG_HEIGHT = 560
+
+SKIN_SHORT_PATH_LEN = 38
+WORKING_FOLDER_SHORT_PATH_LEN = 33
 
 
 def handle_selected_modpack_change():
@@ -27,8 +36,15 @@ def handle_selected_modpack_change():
 
 
 def handle_skin_selected(_, data):
-    dpg.set_value("tag:main/skin_file_path", data["file_path_name"])
+    dpg.set_value("tag:main/skin_file_path",
+                  short_path(SKIN_SHORT_PATH_LEN, data["file_path_name"]))
     settings.set_skin_path(data["file_path_name"])
+
+
+def handle_working_folder_selected(_, data):
+    dpg.set_value("tag:main/working_folder",
+                  short_path(WORKING_FOLDER_SHORT_PATH_LEN, data["file_path_name"]))
+    settings.set_working_folder(data["file_path_name"])
 
 
 def handle_logout():
@@ -37,16 +53,28 @@ def handle_logout():
 
 
 def handle_play():
-    cfg = remote_config.modpack_config_by_name[settings.selected_modpack]
-    modpack_folder = os.path.expanduser(cfg["directory_path"])
+    modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
+    modpack_folder = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
     skins_folder = f"{modpack_folder}/cachedImages/skins"
     skins.sync_own_skin(username=settings.username,
                         token=settings.token,
                         skin_path=settings.skin_path,
                         skins_folder=skins_folder)
     skins.sync_skins(skins_folder=skins_folder)
-    modpack.ensure_modpack_installed(cfg)
-    modpack.start_modpack(cfg)
+    modpack.ensure_modpack_installed(modpack_config)
+    modpack.start_modpack(modpack_config)
+
+
+def short_path(len, path):
+    chunk = path[-len:]
+    if ':' in chunk and chunk[0] != ':':
+        return chunk
+    else:
+        match = re.search(r"[\\/]", chunk)
+        if match:
+            return "..." + chunk[match.start():]
+        else:
+            return chunk
 
 
 def render_main_screen():
@@ -82,24 +110,45 @@ def render_main_screen():
                     dpg.add_button(label="[Перелогінитись]", callback=handle_logout)
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
                     dpg.add_input_text(width=PROFILE_SETTINGS_LABEL_WIDTH, readonly=True, default_value="Скін")
-                    dpg.add_input_text(width=SETTINGS_INPUT_WIDTH,
-                                       tag="tag:main/skin_file_path",
+                    dpg.add_input_text(tag="tag:main/skin_file_path",
+                                       width=SETTINGS_INPUT_WIDTH,
                                        readonly=True,
-                                       default_value=settings.skin_path or "Не вибрано")
+                                       default_value=short_path(SKIN_SHORT_PATH_LEN, settings.skin_path or "Не вибрано"))
                     dpg.add_button(label="[Вибрати]", callback=lambda: dpg.show_item("tag:main/skin_file_dialog"))
                     if dpg.does_alias_exist("tag:main/skin_file_dialog"):
                         dpg.remove_alias("tag:main/skin_file_dialog")
                     with dpg.file_dialog(tag="tag:main/skin_file_dialog",
-                                         width=700,
-                                         height=400,
+                                         width=FILE_DIALOG_WIDTH,
+                                         height=FILE_DIALOG_HEIGHT,
                                          show=False,
                                          callback=handle_skin_selected):
                         dpg.add_file_extension(".png")
 
-            with dpg.collapsing_header(label="Налаштування", default_open=False):
+            with dpg.collapsing_header(label="Загальні налаштування", default_open=False):
+                with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
+                    dpg.add_input_text(width=GENERAL_SETTINGS_LABEL_WIDTH,
+                                       readonly=True,
+                                       default_value="Робоча папка")
+                    dpg.add_input_text(tag="tag:main/working_folder",
+                                       width=506,
+                                       readonly=True,
+                                       default_value=short_path(WORKING_FOLDER_SHORT_PATH_LEN,
+                                                                os.path.expanduser(settings.working_folder)))
+                    dpg.add_button(label="[Вибрати]", callback=lambda: dpg.show_item("tag:main/working_folder_dialog"))
+                    if dpg.does_alias_exist("tag:main/working_folder_dialog"):
+                        dpg.remove_alias("tag:main/working_folder_dialog")
+                    dpg.add_file_dialog(tag="tag:main/working_folder_dialog",
+                                        directory_selector=True,
+                                        width=FILE_DIALOG_WIDTH,
+                                        height=FILE_DIALOG_HEIGHT,
+                                        show=False,
+                                        callback=handle_working_folder_selected)
+
+            with dpg.collapsing_header(label="Налаштування модпаку", default_open=False):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
                     dpg.add_input_text(width=GAME_SETTINGS_LABEL_WIDTH,
-                                       readonly=True, default_value="Мін. оперативки")
+                                       readonly=True,
+                                       default_value="Мін. оперативки")
                     dpg.add_input_int(tag="tag:main/min_ram",
                                       width=144,
                                       default_value=settings.min_ram,
@@ -111,7 +160,8 @@ def render_main_screen():
                                       callback=lambda _, data: settings.set_min_ram(data))
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
                     dpg.add_input_text(width=GAME_SETTINGS_LABEL_WIDTH,
-                                       readonly=True, default_value="Макс. оперативки")
+                                       readonly=True,
+                                       default_value="Макс. оперативки")
                     dpg.add_input_int(tag="tag:main/max_ram",
                                       width=144,
                                       default_value=settings.max_ram,

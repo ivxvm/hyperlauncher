@@ -47,27 +47,26 @@ PROGRESS_CB = {
 ###############################################################################
 
 
-def ensure_modpack_installed(cfg):
-    modpack_folder = os.path.expanduser(cfg["directory_path"])
-    current_version_file = os.path.join(
-        modpack_folder, "client-version.txt")
+def ensure_modpack_installed(modpack_config):
+    modpack_folder = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
+    current_version_file = os.path.join(modpack_folder, "client-version.txt")
     should_download_client = True
     if os.path.isfile(current_version_file):
         with open(current_version_file, 'r') as file:
             current_client_version = file.read().replace('\n', '')
-            if current_client_version == cfg["client_version"]:
+            if current_client_version == modpack_config["client_version"]:
                 should_download_client = False
     if should_download_client:
-        print(f'Installing minecraft client {cfg["client_version"]}')
+        print(f'Installing minecraft client {modpack_config["client_version"]}')
         minecraft_launcher_lib.forge.install_forge_version(
-            cfg["client_version"], modpack_folder, callback=PROGRESS_CB)
+            modpack_config["client_version"], modpack_folder, callback=PROGRESS_CB)
         with open(current_version_file, 'w') as file:
-            file.write(cfg["client_version"])
+            file.write(modpack_config["client_version"])
     repo = git.Repo.init(modpack_folder)
     # origin = None
     if len(repo.remotes) == 0:
         # origin =
-        repo.create_remote("origin", cfg["repository_url"])
+        repo.create_remote("origin", modpack_config["repository_url"])
     # else:
     #     origin = repo.remotes[0]
     # for fetch_info in origin.fetch(progress=CustomRemoteProgress()):
@@ -80,11 +79,11 @@ def ensure_modpack_installed(cfg):
     # repo.head.reset(index=True, working_tree=True)
 
 
-def start_modpack(cfg):
+def start_modpack(modpack_config):
     print("Starting modpack")
-    modpack_directory = os.path.expanduser(cfg["directory_path"])
+    modpack_directory = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
     minecraft_command = minecraft_launcher_lib.command.get_minecraft_command(
-        cfg["client_version"].replace("-", "-forge-"),
+        modpack_config["client_version"].replace("-", "-forge-"),
         modpack_directory,
         {
             "username": settings.username,
