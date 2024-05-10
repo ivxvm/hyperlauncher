@@ -8,14 +8,16 @@ original_stdout = sys.stdout
 
 
 class DpgOutput():
-    def flush(**args):
-        pass
+    def __getattr__(self, attr):
+        return getattr(original_stdout, attr)
+
+    def flush():
+        original_stdout.flush()
 
     def write(self, text: str):
         stripped_text = text.strip()
         if len(stripped_text) > 0:
             try:
-                dpg.set_value("tag:main/log_header", True)
                 dpg.add_text(stripped_text,
                              parent=log_window_id,
                              wrap=constants.WINDOW_WIDTH - 100)

@@ -10,6 +10,7 @@ import modpack
 import skins
 import logger
 import discord_rpc
+import game_log_printer
 import login_screen
 
 MODPACKS_LISTBOX_WIDTH = 300
@@ -67,14 +68,19 @@ def handle_play():
     modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
     modpack_folder = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
     skins_folder = f"{modpack_folder}/cachedImages/skins"
+    dpg.set_value("tag:main/log_header", True)
     skins.sync_own_skin(username=settings.username,
                         token=settings.token,
                         skin_path=settings.skin_path,
                         skins_folder=skins_folder)
     skins.sync_skins(skins_folder=skins_folder)
     modpack.ensure_modpack_installed(modpack_config)
-    discord_rpc.latest_game_process = modpack.start_modpack(modpack_config)
+    game_process = modpack.start_modpack(modpack_config)
+    discord_rpc.latest_game_process = game_process
     discord_rpc.latest_modpack_title = modpack_config['title']
+    game_log_printer.scheduled_timeout = constants.GAME_LOG_PRINTER_PREDELAY
+    game_log_printer.latest_game_process = game_process
+    game_log_printer.latest_modpack_folder = modpack_folder
 
 
 def short_path(len, path):
