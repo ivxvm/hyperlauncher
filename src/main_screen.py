@@ -9,6 +9,7 @@ import remote_config
 import modpack
 import skins
 import logger
+import discord_rpc
 import login_screen
 
 MODPACKS_LISTBOX_WIDTH = 300
@@ -72,7 +73,8 @@ def handle_play():
                         skins_folder=skins_folder)
     skins.sync_skins(skins_folder=skins_folder)
     modpack.ensure_modpack_installed(modpack_config)
-    modpack.start_modpack(modpack_config)
+    discord_rpc.latest_game_process = modpack.start_modpack(modpack_config)
+    discord_rpc.latest_modpack_title = modpack_config['title']
 
 
 def short_path(len, path):

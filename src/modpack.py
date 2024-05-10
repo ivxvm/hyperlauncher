@@ -63,20 +63,10 @@ def ensure_modpack_installed(modpack_config):
         with open(current_version_file, 'w') as file:
             file.write(modpack_config["client_version"])
     repo = git.Repo.init(modpack_folder)
-    # origin = None
     if len(repo.remotes) == 0:
-        # origin =
         repo.create_remote("origin", modpack_config["repository_url"])
-    # else:
-    #     origin = repo.remotes[0]
-    # for fetch_info in origin.fetch(progress=CustomRemoteProgress()):
-    #     print("Updated %s to %s" % (fetch_info.ref, fetch_info.commit))
-    # repo.create_head("main", origin.refs.main)
-    # repo.heads.main.set_tracking_branch(origin.refs.main)
-    # repo.heads.main.checkout()
     print("Syncing modpack files")
-    repo.git.pull("origin", "main", "--rebase", "--autostash")  #
-    # repo.head.reset(index=True, working_tree=True)
+    repo.git.pull("origin", "main", "--rebase", "--autostash")
 
 
 def start_modpack(modpack_config):
@@ -90,8 +80,8 @@ def start_modpack(modpack_config):
             "uid": uuid.uuid4().hex,
             "token": "",
             "jvmArguments": [
-                "-Xms4G",
-                "-Xmx8G",
+                f"-Xms{settings.min_ram}M",
+                f"-Xmx{settings.max_ram}M",
                 "-XX:+UseG1GC",
                 "-XX:+ParallelRefProcEnabled",
                 "-XX:MaxGCPauseMillis=200",
@@ -112,7 +102,7 @@ def start_modpack(modpack_config):
                 "-XX:MaxTenuringThreshold=1"
             ]
         })
-    subprocess.Popen(minecraft_command,
-                     cwd=modpack_directory,
-                     close_fds=True,
-                     creationflags=constants.DETACHED_PROCESS)
+    return subprocess.Popen(minecraft_command,
+                            cwd=modpack_directory,
+                            close_fds=True,
+                            creationflags=constants.DETACHED_PROCESS)

@@ -1,11 +1,12 @@
+import ctypes
 import requests
 import dearpygui.dearpygui as dpg
-import ctypes
 
 import settings
-from constants import *
-from main_screen import render_main_screen
-from login_screen import render_login_screen
+import constants
+import main_screen
+import login_screen
+import discord_rpc as _
 
 
 def main():
@@ -15,11 +16,11 @@ def main():
     dpg.create_context()
     dpg.create_viewport(title="Hyperlauncher",
                         resizable=False,
-                        width=WINDOW_WIDTH,
-                        height=WINDOW_HEIGHT,
+                        width=constants.WINDOW_WIDTH,
+                        height=constants.WINDOW_HEIGHT,
                         x_pos=int(screensize[0] / 2 -
-                                  WINDOW_WIDTH / 2),
-                        y_pos=int(screensize[1] / 2 - WINDOW_HEIGHT / 2))
+                                  constants.WINDOW_WIDTH / 2),
+                        y_pos=int(screensize[1] / 2 - constants.WINDOW_HEIGHT / 2))
     dpg.setup_dearpygui()
 
     with dpg.font_registry():
@@ -52,7 +53,7 @@ def main():
 
     with dpg.theme() as global_theme:
         with dpg.theme_component(dpg.mvAll):
-            for component, color in MAIN_THEME_COLORS:
+            for component, color in constants.MAIN_THEME_COLORS:
                 dpg.add_theme_color(component, color, category=dpg.mvThemeCat_Core)
         with dpg.theme_component(dpg.mvButton):
             dpg.add_theme_color(dpg.mvThemeCol_Button, [0, 0, 0, 0])
@@ -68,17 +69,17 @@ def main():
     dpg.add_window(tag="tag:window")
     dpg.set_primary_window("tag:window", True)
 
-    login_response = requests.post(f'{AUTH_SERVER_URL}/login',
+    login_response = requests.post(f'{constants.AUTH_SERVER_URL}/login',
                                    json={"username": settings.username,
                                          "token": settings.token},
-                                   verify=not IS_LOCALHOST)
+                                   verify=not constants.IS_LOCALHOST)
     if login_response.status_code == 200:
         dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
         settings.reload_user_settings()
         settings.set_token(login_response.text)
-        render_main_screen()
+        main_screen.render_main_screen()
     else:
-        render_login_screen()
+        login_screen.render_login_screen()
 
     dpg.show_viewport()
     dpg.start_dearpygui()
