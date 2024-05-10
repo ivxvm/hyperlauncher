@@ -16,11 +16,11 @@ latest_modpack_title = None
 latest_game_process = None
 
 rpc = Presence(constants.DISCORD_CLIENT_ID)
-rpc.connect()
 
 
 def presence_worker_tick():
     global rpc_state, rpc_data
+    rpc.connect()
     while True:
         new_rpc_state = rpc_state
         if latest_game_process and latest_game_process.poll() == None:
