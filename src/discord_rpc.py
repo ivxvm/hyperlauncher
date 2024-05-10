@@ -18,7 +18,7 @@ latest_game_process = None
 rpc = Presence(constants.DISCORD_CLIENT_ID)
 
 
-def presence_worker_tick():
+def presence_worker():
     global rpc_state, rpc_data
     rpc.connect()
     while True:
@@ -36,5 +36,5 @@ def presence_worker_tick():
         time.sleep(constants.DISCORD_PRESENCE_WORKER_INTERVAL)
 
 
-presence_worker_thread = Thread(target=presence_worker_tick, daemon=True)
+presence_worker_thread = Thread(target=presence_worker, daemon=True)
 presence_worker_thread.start()
