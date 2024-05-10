@@ -2,9 +2,11 @@ import dearpygui.dearpygui as dpg
 
 LAUCNHER_CONFIG_FILE = "~/hyperlauncher.conf"
 MODPACKS_CONFIG_URL = "https://raw.githubusercontent.com/ivxvm/hypercube-modpacks/main/hypercube-modpacks.json"
+
 DISCORD_URL = "https://discord.com/invite/4dv9qGebhW"
 GITHUB_URL = "https://github.com/ivxvm?tab=repositories"
 AUTH_SERVER_URL = "https://localhost:8443"
+
 IS_LOCALHOST = "localhost" in AUTH_SERVER_URL
 
 DEFAULT_MIN_RAM = 4096
@@ -15,7 +17,6 @@ WINDOW_HEIGHT = 768
 LOGO_WIDTH = 400
 LOGO_HEIGHT = 400
 LOGO_OFFSET_TOP = 40
-MODPACKS_LISTBOX_WIDTH = 300
 
 DETACHED_PROCESS = 0x00000008
 

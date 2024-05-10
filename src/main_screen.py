@@ -8,21 +8,31 @@ import settings
 import remote_config
 import modpack
 import skins
-import dpg_stdout_redirect
+import logger
 import login_screen
+
+MODPACKS_LISTBOX_WIDTH = 300
 
 SETTINGS_INDENT = 28
 SETTINGS_INPUT_WIDTH = 570
 
 PROFILE_SETTINGS_LABEL_WIDTH = 128
 GENERAL_SETTINGS_LABEL_WIDTH = 192
-GAME_SETTINGS_LABEL_WIDTH = 256
+
+MODPACK_SETTINGS_LABEL_WIDTH = 256
+MODPACK_SETTINGS_INPUT_WIDTH = 144
 
 FILE_DIALOG_WIDTH = 880
 FILE_DIALOG_HEIGHT = 560
 
 SKIN_SHORT_PATH_LEN = 38
 WORKING_FOLDER_SHORT_PATH_LEN = 33
+
+MIN_RAM_MIN_VALUE = 2048
+MIN_RAM_MAX_VALUE = 8096
+MAX_RAM_MIN_VALUE = 4096
+MAX_RAM_MAX_VALUE = 16384
+RAM_STEP = 512
 
 
 def handle_selected_modpack_change():
@@ -81,7 +91,7 @@ def render_main_screen():
     with dpg.group(tag="tag:main", parent="tag:window"):
         with dpg.group(horizontal=True):
             dpg.add_listbox(
-                width=constants.MODPACKS_LISTBOX_WIDTH,
+                width=MODPACKS_LISTBOX_WIDTH,
                 tag="tag:main/selected_modpack",
                 items=remote_config.modpack_titles,
                 default_value=remote_config.modpack_config_by_name[
@@ -96,7 +106,7 @@ def render_main_screen():
                                  settings.selected_modpack or
                                  next(iter(remote_config.modpack_config_by_name))
                              ]["description"],
-                             wrap=constants.WINDOW_WIDTH - constants.MODPACKS_LISTBOX_WIDTH - 100)
+                             wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
 
         dpg.add_spacer()
 
@@ -146,36 +156,36 @@ def render_main_screen():
 
             with dpg.collapsing_header(label="Налаштування модпаку", default_open=False):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
-                    dpg.add_input_text(width=GAME_SETTINGS_LABEL_WIDTH,
+                    dpg.add_input_text(width=MODPACK_SETTINGS_LABEL_WIDTH,
                                        readonly=True,
                                        default_value="Мін. оперативки")
                     dpg.add_input_int(tag="tag:main/min_ram",
-                                      width=144,
+                                      width=MODPACK_SETTINGS_INPUT_WIDTH,
                                       default_value=settings.min_ram,
-                                      min_value=2048,
-                                      max_value=8096,
-                                      step=512,
+                                      min_value=MIN_RAM_MIN_VALUE,
+                                      max_value=MIN_RAM_MAX_VALUE,
+                                      step=RAM_STEP,
                                       min_clamped=True,
                                       max_clamped=True,
                                       callback=lambda _, data: settings.set_min_ram(data))
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
-                    dpg.add_input_text(width=GAME_SETTINGS_LABEL_WIDTH,
+                    dpg.add_input_text(width=MODPACK_SETTINGS_LABEL_WIDTH,
                                        readonly=True,
                                        default_value="Макс. оперативки")
                     dpg.add_input_int(tag="tag:main/max_ram",
-                                      width=144,
+                                      width=MODPACK_SETTINGS_INPUT_WIDTH,
                                       default_value=settings.max_ram,
-                                      min_value=4096,
-                                      max_value=16384,
-                                      step=512,
+                                      min_value=MAX_RAM_MIN_VALUE,
+                                      max_value=MAX_RAM_MAX_VALUE,
+                                      step=RAM_STEP,
                                       min_clamped=True,
                                       max_clamped=True,
                                       callback=lambda _, data: settings.set_max_ram(data))
 
             with dpg.collapsing_header(label="Лог", tag="tag:main/log_header", default_open=False):
-                dpg_stdout_redirect.log_window_id = dpg.add_child_window(height=200,
-                                                                         border=False,
-                                                                         indent=SETTINGS_INDENT + 4)
+                logger.log_window_id = dpg.add_child_window(height=200,
+                                                            border=False,
+                                                            indent=SETTINGS_INDENT + 4)
 
         with dpg.group(tag="tag:main/bottom_buttons_spacer_group"):
             dpg.add_spacer(tag="tag:main/bottom_buttons_spacer")
