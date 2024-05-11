@@ -1,6 +1,5 @@
 import os
 import subprocess
-import uuid
 import git
 import minecraft_launcher_lib
 
@@ -77,8 +76,6 @@ def start_modpack(modpack_config):
         modpack_directory,
         {
             "username": settings.username,
-            "uid": uuid.uuid4().hex,
-            "token": "",
             "jvmArguments": [
                 f"-Xms{settings.min_ram}M",
                 f"-Xmx{settings.max_ram}M",
