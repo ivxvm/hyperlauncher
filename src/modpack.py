@@ -1,4 +1,5 @@
 import os
+import uuid
 import subprocess
 import git
 import minecraft_launcher_lib
@@ -76,7 +77,13 @@ def start_modpack(modpack_config):
         modpack_directory,
         {
             "username": settings.username,
+            "uid": uuid.uuid4().hex,
+            "token": uuid.uuid4().hex,
             "jvmArguments": [
+                "-Dminecraft.api.auth.host=https://nope.invalid",
+                "-Dminecraft.api.account.host=https://nope.invalid",
+                "-Dminecraft.api.session.host=https://nope.invalid",
+                "-Dminecraft.api.services.host=https://nope.invalid",
                 f"-Xms{settings.min_ram}M",
                 f"-Xmx{settings.max_ram}M",
                 "-XX:+UseG1GC",
