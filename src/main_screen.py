@@ -86,18 +86,11 @@ def handle_play():
 
 
 def render_news(news):
-    result = ""
-    for [date, description] in news:
-        result += date + '\n'
-        result += description + '\n\n'
-    return result
+    return "\n\n".join(["\n".join(entry) for entry in news])
 
 
 def render_notes(notes):
-    result = ""
-    for entry in notes:
-        result += entry + '\n\n'
-    return result
+    return "\n".join(notes)
 
 
 def short_path(len, path):
