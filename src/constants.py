@@ -32,7 +32,16 @@ MAIN_THEME_COLORS = [
     [dpg.mvThemeCol_ChildBg, (20, 20, 34)],
     [dpg.mvThemeCol_Header, (20, 20, 34)],
     [dpg.mvThemeCol_FrameBg, (20, 20, 34)],
-    [dpg.mvThemeCol_Border, (139, 109, 156, 0)],
+    [dpg.mvThemeCol_Border, (139, 109, 156)],
     [dpg.mvThemeCol_Text, (198, 159, 165)],
-    [dpg.mvThemeCol_FrameBgActive, (78, 47, 98)]
+    [dpg.mvThemeCol_FrameBgActive, (78, 47, 98)],
+    [dpg.mvThemeCol_Tab, (20, 20, 34)],
+    [dpg.mvThemeCol_TabActive, (78, 47, 98)],
+]
+
+MAIN_THEME_BUTTON_COLORS = [
+    [dpg.mvThemeCol_Button, [0, 0, 0, 0]],
+    [dpg.mvThemeCol_ButtonActive, [0, 0, 0]],
+    [dpg.mvThemeCol_ButtonHovered, [242, 211, 171, 25]],
+    [dpg.mvThemeCol_Text, [242, 211, 171]],
 ]

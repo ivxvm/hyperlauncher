@@ -56,11 +56,11 @@ def main():
             for component, color in constants.MAIN_THEME_COLORS:
                 dpg.add_theme_color(component, color, category=dpg.mvThemeCat_Core)
         with dpg.theme_component(dpg.mvButton):
-            dpg.add_theme_color(dpg.mvThemeCol_Button, [0, 0, 0, 0])
-            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, [0, 0, 0, 0])
-            dpg.add_theme_color(
-                dpg.mvThemeCol_ButtonHovered, [242, 211, 171, 25])
-            dpg.add_theme_color(dpg.mvThemeCol_Text, [242, 211, 171])
+            for component, color in constants.MAIN_THEME_BUTTON_COLORS:
+                dpg.add_theme_color(component, color)
+        with dpg.theme_component(dpg.mvListbox):
+            dpg.add_theme_style(dpg.mvStyleVar_FrameBorderSize, 1)
+            dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 8, 6)
 
     dpg.bind_theme(global_theme)
 

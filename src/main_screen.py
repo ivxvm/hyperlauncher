@@ -13,7 +13,7 @@ import discord_rpc
 import game_log_printer
 import login_screen
 
-MODPACKS_LISTBOX_WIDTH = 300
+MODPACKS_LISTBOX_WIDTH = 400
 
 SETTINGS_INDENT = 28
 SETTINGS_INPUT_WIDTH = 570
@@ -44,7 +44,9 @@ def handle_selected_modpack_change():
     settings.reload_modpack_settings()
     dpg.set_value("tag:main/min_ram", settings.min_ram)
     dpg.set_value("tag:main/max_ram", settings.max_ram)
-    dpg.set_value("tag:main/description", modpack_config["description"])
+    dpg.set_value("tag:main/modpack_news", render_news(modpack_config["news"]))
+    dpg.set_value("tag:main/modpack_description", modpack_config["description"])
+    dpg.set_value("tag:main/modpack_notes", render_notes(modpack_config["notes"]))
 
 
 def handle_skin_selected(_, data):
@@ -83,6 +85,21 @@ def handle_play():
     game_log_printer.latest_modpack_folder = modpack_folder
 
 
+def render_news(news):
+    result = ""
+    for [date, description] in news:
+        result += date + '\n'
+        result += description + '\n\n'
+    return result
+
+
+def render_notes(notes):
+    result = ""
+    for entry in notes:
+        result += entry + '\n\n'
+    return result
+
+
 def short_path(len, path):
     chunk = path[-len:]
     if ':' in chunk and chunk[0] != ':':
@@ -98,27 +115,41 @@ def short_path(len, path):
 def render_main_screen():
     with dpg.group(tag="tag:main", parent="tag:window"):
         with dpg.group(horizontal=True):
-            dpg.add_listbox(
-                width=MODPACKS_LISTBOX_WIDTH,
-                tag="tag:main/selected_modpack",
-                items=remote_config.modpack_titles,
-                default_value=remote_config.modpack_config_by_name[
-                    settings.selected_modpack or
-                    next(iter(remote_config.modpack_config_by_name))
-                ]['title'],
-                callback=handle_selected_modpack_change)
-
-            with dpg.child_window(height=300, autosize_x=True):
-                dpg.add_text(tag="tag:main/description",
-                             default_value=remote_config.modpack_config_by_name[
-                                 settings.selected_modpack or
-                                 next(iter(remote_config.modpack_config_by_name))
-                             ]["description"],
-                             wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
+            with dpg.group():
+                dpg.add_text("", indent=2)
+                dpg.add_listbox(
+                    width=MODPACKS_LISTBOX_WIDTH,
+                    tag="tag:main/selected_modpack",
+                    items=remote_config.modpack_titles,
+                    default_value=remote_config.modpack_config_by_name[
+                        settings.selected_modpack or
+                        next(iter(remote_config.modpack_config_by_name))
+                    ]['title'],
+                    callback=handle_selected_modpack_change)
+            last_selected_modpack_config = remote_config.modpack_config_by_name[
+                settings.selected_modpack or
+                next(iter(remote_config.modpack_config_by_name))
+            ]
+            with dpg.tab_bar(tag="tag:main/modpack_tab_bar"):
+                with dpg.tab(label="Новини", tag="tag:main/modpack_news_tab"):
+                    with dpg.child_window(height=300, autosize_x=True):
+                        dpg.add_text(tag="tag:main/modpack_news",
+                                     default_value=render_news(last_selected_modpack_config["news"]),
+                                     wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
+                with dpg.tab(label="Опис", tag="tag:main/modpack_description_tab"):
+                    with dpg.child_window(height=300, autosize_x=True):
+                        dpg.add_text(tag="tag:main/modpack_description",
+                                     default_value=last_selected_modpack_config["description"],
+                                     wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
+                with dpg.tab(label="Нотатки", tag="tag:main/modpack_notes_tab"):
+                    with dpg.child_window(height=300, autosize_x=True):
+                        dpg.add_text(tag="tag:main/modpack_notes",
+                                     default_value=render_notes(last_selected_modpack_config["notes"]),
+                                     wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
 
         dpg.add_spacer()
 
-        with dpg.child_window(height=346):
+        with dpg.child_window(height=340):
             with dpg.collapsing_header(label="Профіль", default_open=False):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
                     dpg.add_input_text(width=PROFILE_SETTINGS_LABEL_WIDTH, readonly=True, default_value="Нікнейм")
