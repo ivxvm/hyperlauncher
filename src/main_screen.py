@@ -13,13 +13,16 @@ import discord_rpc
 import game_log_printer
 import login_screen
 
+import localization
+from localization import localize
+
 MODPACKS_LISTBOX_WIDTH = 400
 
 SETTINGS_INDENT = 28
 SETTINGS_INPUT_WIDTH = 570
 
 PROFILE_SETTINGS_LABEL_WIDTH = 128
-GENERAL_SETTINGS_LABEL_WIDTH = 192
+GENERAL_SETTINGS_LABEL_WIDTH = 224
 
 MODPACK_SETTINGS_LABEL_WIDTH = 256
 MODPACK_SETTINGS_INPUT_WIDTH = 144
@@ -38,15 +41,16 @@ RAM_STEP = 512
 
 
 def handle_selected_modpack_change():
-    modpack_config = remote_config.modpack_config_by_title[dpg.get_value("tag:main/selected_modpack")]
+    selected_modpack_title = dpg.get_value("tag:main/selected_modpack")
+    modpack_config = remote_config.modpack_config_by_locale_and_title[settings.locale][selected_modpack_title]
     selected_modpack = modpack_config['name']
     settings.set_selected_modpack(selected_modpack)
     settings.reload_modpack_settings()
     dpg.set_value("tag:main/min_ram", settings.min_ram)
     dpg.set_value("tag:main/max_ram", settings.max_ram)
-    dpg.set_value("tag:main/modpack_news", render_news(modpack_config["news"]))
-    dpg.set_value("tag:main/modpack_description", modpack_config["description"])
-    dpg.set_value("tag:main/modpack_notes", render_notes(modpack_config["notes"]))
+    dpg.set_value("tag:main/modpack_news", render_news(modpack_config["news"][settings.locale]))
+    dpg.set_value("tag:main/modpack_description", modpack_config["description"][settings.locale])
+    dpg.set_value("tag:main/modpack_notes", render_notes(modpack_config["notes"][settings.locale]))
 
 
 def handle_skin_selected(_, data):
@@ -59,6 +63,12 @@ def handle_working_folder_selected(_, data):
     dpg.set_value("tag:main/working_folder",
                   short_path(WORKING_FOLDER_SHORT_PATH_LEN, data["file_path_name"]))
     settings.set_working_folder(data["file_path_name"])
+
+
+def handle_locale_selected(_, data):
+    settings.set_locale(localization.locale_name_by_title[data])
+    dpg.delete_item("tag:main")
+    render_main_screen()
 
 
 def handle_logout():
@@ -106,57 +116,61 @@ def short_path(len, path):
 
 
 def render_main_screen():
+    if not settings.selected_modpack:
+        settings.set_selected_modpack(next(iter(remote_config.modpack_config_by_name)))
+
     with dpg.group(tag="tag:main", parent="tag:window"):
         with dpg.group(horizontal=True):
+            selected_modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
             with dpg.group():
                 dpg.add_text("", indent=2)
                 dpg.add_listbox(
                     width=MODPACKS_LISTBOX_WIDTH,
                     tag="tag:main/selected_modpack",
-                    items=remote_config.modpack_titles,
-                    default_value=remote_config.modpack_config_by_name[
-                        settings.selected_modpack or
-                        next(iter(remote_config.modpack_config_by_name))
-                    ]['title'],
+                    items=remote_config.modpack_titles_by_locale[settings.locale],
+                    default_value=selected_modpack_config['title'][settings.locale],
                     callback=handle_selected_modpack_change)
-            last_selected_modpack_config = remote_config.modpack_config_by_name[
-                settings.selected_modpack or
-                next(iter(remote_config.modpack_config_by_name))
-            ]
             with dpg.tab_bar(tag="tag:main/modpack_tab_bar"):
-                with dpg.tab(label="Новини", tag="tag:main/modpack_news_tab"):
+                with dpg.tab(label=localize("Новини"), tag="tag:main/modpack_news_tab"):
                     with dpg.child_window(height=300, autosize_x=True):
                         dpg.add_text(tag="tag:main/modpack_news",
-                                     default_value=render_news(last_selected_modpack_config["news"]),
+                                     default_value=render_news(selected_modpack_config["news"][settings.locale]),
                                      wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
-                with dpg.tab(label="Опис", tag="tag:main/modpack_description_tab"):
+                with dpg.tab(label=localize("Опис"), tag="tag:main/modpack_description_tab"):
                     with dpg.child_window(height=300, autosize_x=True):
                         dpg.add_text(tag="tag:main/modpack_description",
-                                     default_value=last_selected_modpack_config["description"],
+                                     default_value=selected_modpack_config["description"][settings.locale],
                                      wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
-                with dpg.tab(label="Нотатки", tag="tag:main/modpack_notes_tab"):
+                with dpg.tab(label=localize("Нотатки"), tag="tag:main/modpack_notes_tab"):
                     with dpg.child_window(height=300, autosize_x=True):
                         dpg.add_text(tag="tag:main/modpack_notes",
-                                     default_value=render_notes(last_selected_modpack_config["notes"]),
+                                     default_value=render_notes(
+                                         selected_modpack_config["notes"][settings.locale]),
                                      wrap=constants.WINDOW_WIDTH - MODPACKS_LISTBOX_WIDTH - 100)
 
         dpg.add_spacer()
 
         with dpg.child_window(height=340):
-            with dpg.collapsing_header(label="Профіль", default_open=False):
+            with dpg.collapsing_header(label=localize("Профіль"), default_open=False):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
-                    dpg.add_input_text(width=PROFILE_SETTINGS_LABEL_WIDTH, readonly=True, default_value="Нікнейм")
-                    dpg.add_input_text(width=SETTINGS_INPUT_WIDTH,
+                    dpg.add_input_text(default_value=localize("Нікнейм"),
                                        readonly=True,
-                                       default_value=settings.username)
-                    dpg.add_button(label="[Перелогінитись]", callback=handle_logout)
+                                       width=PROFILE_SETTINGS_LABEL_WIDTH)
+                    dpg.add_input_text(default_value=settings.username,
+                                       readonly=True,
+                                       width=SETTINGS_INPUT_WIDTH)
+                    dpg.add_button(label=localize("[Перелогінитись]"), callback=handle_logout)
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
-                    dpg.add_input_text(width=PROFILE_SETTINGS_LABEL_WIDTH, readonly=True, default_value="Скін")
+                    dpg.add_input_text(default_value=localize("Скін"),
+                                       readonly=True,
+                                       width=PROFILE_SETTINGS_LABEL_WIDTH)
                     dpg.add_input_text(tag="tag:main/skin_file_path",
-                                       width=SETTINGS_INPUT_WIDTH,
+                                       default_value=short_path(
+                                           SKIN_SHORT_PATH_LEN, settings.skin_path or localize("Не вибрано")),
                                        readonly=True,
-                                       default_value=short_path(SKIN_SHORT_PATH_LEN, settings.skin_path or "Не вибрано"))
-                    dpg.add_button(label="[Вибрати]", callback=lambda: dpg.show_item("tag:main/skin_file_dialog"))
+                                       width=SETTINGS_INPUT_WIDTH)
+                    dpg.add_button(label=localize("[Вибрати]"),
+                                   callback=lambda: dpg.show_item("tag:main/skin_file_dialog"))
                     if dpg.does_alias_exist("tag:main/skin_file_dialog"):
                         dpg.remove_alias("tag:main/skin_file_dialog")
                     with dpg.file_dialog(tag="tag:main/skin_file_dialog",
@@ -166,17 +180,18 @@ def render_main_screen():
                                          callback=handle_skin_selected):
                         dpg.add_file_extension(".png")
 
-            with dpg.collapsing_header(label="Загальні налаштування", default_open=False):
+            with dpg.collapsing_header(label=localize("Загальні налаштування"), default_open=False):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
-                    dpg.add_input_text(width=GENERAL_SETTINGS_LABEL_WIDTH,
+                    dpg.add_input_text(default_value=localize("Робоча папка"),
                                        readonly=True,
-                                       default_value="Робоча папка")
+                                       width=GENERAL_SETTINGS_LABEL_WIDTH)
                     dpg.add_input_text(tag="tag:main/working_folder",
-                                       width=506,
+                                       width=474,
                                        readonly=True,
                                        default_value=short_path(WORKING_FOLDER_SHORT_PATH_LEN,
                                                                 os.path.expanduser(settings.working_folder)))
-                    dpg.add_button(label="[Вибрати]", callback=lambda: dpg.show_item("tag:main/working_folder_dialog"))
+                    dpg.add_button(label=localize("[Вибрати]"),
+                                   callback=lambda: dpg.show_item("tag:main/working_folder_dialog"))
                     if dpg.does_alias_exist("tag:main/working_folder_dialog"):
                         dpg.remove_alias("tag:main/working_folder_dialog")
                     dpg.add_file_dialog(tag="tag:main/working_folder_dialog",
@@ -185,12 +200,20 @@ def render_main_screen():
                                         height=FILE_DIALOG_HEIGHT,
                                         show=False,
                                         callback=handle_working_folder_selected)
-
-            with dpg.collapsing_header(label="Налаштування модпаку", default_open=False):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
-                    dpg.add_input_text(width=MODPACK_SETTINGS_LABEL_WIDTH,
+                    dpg.add_input_text(default_value=localize("Мова"),
                                        readonly=True,
-                                       default_value="Мін. оперативки")
+                                       width=GENERAL_SETTINGS_LABEL_WIDTH)
+                    dpg.add_combo([locale.title for locale in localization.LOCALES],
+                                  default_value=localization.locale_title_by_name[settings.locale],
+                                  width=200,
+                                  callback=handle_locale_selected)
+
+            with dpg.collapsing_header(label=localize("Налаштування модпаку"), default_open=False):
+                with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
+                    dpg.add_input_text(default_value=localize("Мін. оперативки"),
+                                       readonly=True,
+                                       width=MODPACK_SETTINGS_LABEL_WIDTH)
                     dpg.add_input_int(tag="tag:main/min_ram",
                                       width=MODPACK_SETTINGS_INPUT_WIDTH,
                                       default_value=settings.min_ram,
@@ -201,9 +224,9 @@ def render_main_screen():
                                       max_clamped=True,
                                       callback=lambda _, data: settings.set_min_ram(data))
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
-                    dpg.add_input_text(width=MODPACK_SETTINGS_LABEL_WIDTH,
+                    dpg.add_input_text(default_value=localize("Макс. оперативки"),
                                        readonly=True,
-                                       default_value="Макс. оперативки")
+                                       width=MODPACK_SETTINGS_LABEL_WIDTH)
                     dpg.add_input_int(tag="tag:main/max_ram",
                                       width=MODPACK_SETTINGS_INPUT_WIDTH,
                                       default_value=settings.max_ram,
@@ -214,7 +237,7 @@ def render_main_screen():
                                       max_clamped=True,
                                       callback=lambda _, data: settings.set_max_ram(data))
 
-            with dpg.collapsing_header(label="Лог", tag="tag:main/log_header", default_open=False):
+            with dpg.collapsing_header(label=localize("Лог"), tag="tag:main/log_header", default_open=False):
                 logger.log_window_id = dpg.add_child_window(height=200,
                                                             border=False,
                                                             indent=SETTINGS_INDENT + 4)
@@ -225,7 +248,7 @@ def render_main_screen():
         with dpg.group(tag="tag:main/bottom_buttons", horizontal=True):
             dpg.add_spacer(width=64)
             dpg.add_button(
-                label="[Запуск]",
+                label=localize("[Запуск]"),
                 width=116,
                 height=24,
                 callback=handle_play)

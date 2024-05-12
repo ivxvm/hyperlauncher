@@ -3,12 +3,13 @@ from os import path
 import ctypes
 import requests
 import dearpygui.dearpygui as dpg
+import discord_rpc as _
 
 import settings
 import constants
-import main_screen
+import locale_screen
 import login_screen
-import discord_rpc as _
+import main_screen
 
 FONT_PATH = path.join(path.dirname(__file__), "assets/Minecraft_1.1.ttf")
 LOGO_PATH = path.join(path.dirname(__file__), "assets/logo.png")
@@ -74,17 +75,34 @@ def main():
     dpg.add_window(tag="tag:window")
     dpg.set_primary_window("tag:window", True)
 
-    login_response = requests.post(f'{constants.AUTH_SERVER_URL}/login',
-                                   json={"username": settings.username,
-                                         "token": settings.token},
-                                   verify=not constants.IS_LOCALHOST)
-    if login_response.status_code == 200:
-        dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
-        settings.reload_user_settings()
-        settings.set_token(login_response.text)
-        main_screen.render_main_screen()
-    else:
-        login_screen.render_login_screen()
+    try:
+        login_response = requests.post(f'{constants.AUTH_SERVER_URL}/login',
+                                       json={"username": settings.username,
+                                             "token": settings.token},
+                                       verify=not constants.IS_LOCALHOST)
+
+        if login_response.status_code == 200:
+            dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
+            settings.reload_user_settings()
+            settings.set_token(login_response.text)
+
+        if settings.locale:
+            if login_response.status_code == 200:
+                main_screen.render_main_screen()
+            else:
+                login_screen.render_login_screen()
+        else:
+            locale_screen.render_locale_screen()
+    except:
+        with dpg.group(tag="tag:connection_error", parent="tag:window"):
+            y = constants.WINDOW_HEIGHT / 2 - 32
+            for message in ["Не вдалося підключитися до сервера!",
+                            "Error connecting to the server!"]:
+                error_button = dpg.add_button(label=message,
+                                              pos=[0, y],
+                                              width=constants.WINDOW_WIDTH)
+                dpg.bind_item_theme(error_button, "theme:error_text")
+                y += 64
 
     dpg.show_viewport()
     dpg.start_dearpygui()
