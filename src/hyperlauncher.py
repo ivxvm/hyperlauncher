@@ -1,3 +1,5 @@
+from os import path
+
 import ctypes
 import requests
 import dearpygui.dearpygui as dpg
@@ -7,6 +9,9 @@ import constants
 import main_screen
 import login_screen
 import discord_rpc as _
+
+FONT_PATH = path.join(path.dirname(__file__), "assets/Minecraft_1.1.ttf")
+LOGO_PATH = path.join(path.dirname(__file__), "assets/logo.png")
 
 
 def main():
@@ -24,13 +29,13 @@ def main():
     dpg.setup_dearpygui()
 
     with dpg.font_registry():
-        with dpg.font("Minecraft_1.1.ttf", size=20) as font:
+        with dpg.font(FONT_PATH, size=20) as font:
             dpg.add_font_range_hint(dpg.mvFontRangeHint_Cyrillic)
             dpg.add_font_range_hint(dpg.mvFontRangeHint_Default)
             dpg.bind_font(font)
 
     with dpg.texture_registry():
-        width, height, _, data = dpg.load_image("logo.png")
+        width, height, _, data = dpg.load_image(LOGO_PATH)
         dpg.add_static_texture(width=width, height=height, default_value=data, tag="tag:logo")
 
     with dpg.theme(tag="theme:hyperlink"):
