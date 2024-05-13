@@ -89,7 +89,7 @@ def handle_play():
     modpack.ensure_modpack_installed(modpack_config)
     game_process = modpack.start_modpack(modpack_config)
     discord_rpc.latest_game_process = game_process
-    discord_rpc.latest_modpack_title = modpack_config['title']
+    discord_rpc.latest_modpack_title = modpack_config['title'][settings.locale]
     game_log_printer.scheduled_timeout = constants.GAME_LOG_PRINTER_PREDELAY
     game_log_printer.latest_game_process = game_process
     game_log_printer.latest_modpack_folder = modpack_folder
