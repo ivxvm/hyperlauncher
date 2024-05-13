@@ -1,1 +1,1 @@
-python -m PyInstaller .\src\hyperlauncher.py --onefile --noconsole --add-data=".\src\assets\Minecraft_1.1.ttf:." --add-data=".\src\assets\logo.png:."
+python -m PyInstaller .\src\hyperlauncher.py --onefile --noconsole --add-data=".\src\assets\Minecraft_1.1.ttf:assets" --add-data=".\src\assets\logo.png:assets" --add-data=".\src\assets\icon.ico:assets" --icon=".\src\assets\icon.ico"

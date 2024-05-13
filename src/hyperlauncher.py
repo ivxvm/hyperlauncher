@@ -13,6 +13,7 @@ import main_screen
 
 FONT_PATH = path.join(path.dirname(__file__), "assets/Minecraft_1.1.ttf")
 LOGO_PATH = path.join(path.dirname(__file__), "assets/logo.png")
+ICON_PATH = path.join(path.dirname(__file__), "assets/icon.ico")
 
 
 def main():
@@ -22,6 +23,8 @@ def main():
     dpg.create_context()
     dpg.create_viewport(title="Hyperlauncher",
                         resizable=False,
+                        small_icon=ICON_PATH,
+                        large_icon=ICON_PATH,
                         width=constants.WINDOW_WIDTH,
                         height=constants.WINDOW_HEIGHT,
                         x_pos=int(screensize[0] / 2 -

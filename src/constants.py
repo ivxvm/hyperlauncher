@@ -3,10 +3,10 @@ import dearpygui.dearpygui as dpg
 LAUCNHER_CONFIG_FILE = "~/hyperlauncher.conf"
 MODPACKS_CONFIG_URL = "https://raw.githubusercontent.com/ivxvm/hypercube-modpacks/main/hypercube-modpacks.json"
 
-AUTH_SERVER_URL = "https://localhost:8443"
+AUTH_SERVER_URL = "https://hypercube.in.ua:8443"
 IS_LOCALHOST = "localhost" in AUTH_SERVER_URL
 
-GITHUB_URL = "https://github.com/ivxvm?tab=repositories"
+GITHUB_URL = "https://github.com/ivxvm/hyperlauncher"
 DISCORD_URL = "https://discord.com/invite/4dv9qGebhW"
 
 DISCORD_CLIENT_ID = "1238431431437582397"
