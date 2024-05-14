@@ -49,6 +49,9 @@ ua_to_en = {
     "[Зареєструватись]": "[Register]",
     "Лог": "Log",
     "Мова": "Language",
+    "Git не знайдено на комп'ютері!": "Git installation not found!",
+    "Зачекайте, згодом буде завантажено і запущено його інсталятор.": "Please wait, the installer will be downloaded and launched soon.",
+    "Перезапустіть лаунчер після завершення інсталяції.": "Please restart the launcher after the installation is completed."
 }
 
 

@@ -4,6 +4,7 @@ import os
 import shutil
 
 import constants
+import utils
 
 
 def sync_own_skin(username, token, skin_path, skins_folder):
@@ -52,7 +53,7 @@ def sync_skins(skins_folder):
                         should_download_remote_skin = False
                 if should_download_remote_skin:
                     print(f"Syncing skin for {username}")
-                    download_file(f'{constants.AUTH_SERVER_URL}/skin?username={username}', local_skin_filename)
+                    utils.download_file(f'{constants.AUTH_SERVER_URL}/skin?username={username}', local_skin_filename)
     else:
         print(f"Failed to sync remote skins, status code: {status_code}")
 
@@ -63,12 +64,3 @@ def get_file_md5(path):
         while chunk := f.read(8192):
             hash.update(chunk)
     return hash.hexdigest()
-
-
-def download_file(url, path):
-    with requests.get(url, stream=True, verify=not constants.IS_LOCALHOST) as r:
-        r.raise_for_status()
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                f.write(chunk)

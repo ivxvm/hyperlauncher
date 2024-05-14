@@ -10,6 +10,8 @@ import constants
 import locale_screen
 import login_screen
 import main_screen
+import git_install_screen
+import git_installer
 
 FONT_PATH = path.join(path.dirname(__file__), "assets/Minecraft_1.1.ttf")
 LOGO_PATH = path.join(path.dirname(__file__), "assets/logo.png")
@@ -91,7 +93,10 @@ def main():
 
         if settings.locale:
             if login_response.status_code == 200:
-                main_screen.render_main_screen()
+                if git_installer.check_git_installed():
+                    main_screen.render_main_screen()
+                else:
+                    git_install_screen.render_git_install_screen()
             else:
                 login_screen.render_login_screen()
         else:

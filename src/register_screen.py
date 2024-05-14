@@ -6,6 +6,8 @@ import settings
 import constants
 import login_screen
 import main_screen
+import git_install_screen
+import git_installer
 
 from localization import localize
 
@@ -42,7 +44,10 @@ def handle_register_click():
         settings.set_username(username)
         dpg.set_exit_callback(None)
         dpg.delete_item("tag:register")
-        main_screen.render_main_screen()
+        if git_installer.check_git_installed():
+            main_screen.render_main_screen()
+        else:
+            git_install_screen.render_git_install_screen()
     else:
         error_text = ''
         match status_code:

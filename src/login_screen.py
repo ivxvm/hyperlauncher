@@ -6,6 +6,8 @@ import settings
 import constants
 import main_screen
 import register_screen
+import git_install_screen
+import git_installer
 
 from localization import localize
 
@@ -39,7 +41,10 @@ def handle_login_click():
         dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
         dpg.set_exit_callback(None)
         dpg.delete_item("tag:login")
-        main_screen.render_main_screen()
+        if git_installer.check_git_installed():
+            main_screen.render_main_screen()
+        else:
+            git_install_screen.render_git_install_screen()
     else:
         error_text = ""
         match status_code:

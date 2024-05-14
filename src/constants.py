@@ -6,6 +6,9 @@ MODPACKS_CONFIG_URL = "https://raw.githubusercontent.com/ivxvm/hypercube-modpack
 AUTH_SERVER_URL = "https://hypercube.in.ua:8443"
 IS_LOCALHOST = "localhost" in AUTH_SERVER_URL
 
+GIT_WINDOWS_URL = "https://github.com/git-for-windows/git/releases/download/v2.45.0.windows.1/Git-2.45.0-64-bit.exe"
+GIT_WATCHER_INTERVAL = 1
+
 GITHUB_URL = "https://github.com/ivxvm/hyperlauncher"
 DISCORD_URL = "https://discord.com/invite/4dv9qGebhW"
 
