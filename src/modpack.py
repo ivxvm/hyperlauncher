@@ -7,6 +7,11 @@ import minecraft_launcher_lib
 import constants
 import settings
 
+
+current_modpack_process = None
+current_modpack_config = None
+
+
 ###############################################################################
 
 
@@ -47,6 +52,11 @@ PROGRESS_CB = {
 ###############################################################################
 
 
+def get_modpack_folder(modpack_config):
+    return modpack_config and os.path.expanduser(settings.working_folder + "/" +
+                                                 modpack_config["directory_name"])
+
+
 def ensure_modpack_installed(modpack_config):
     modpack_folder = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
     current_version_file = os.path.join(modpack_folder, "client-version.txt")
@@ -70,6 +80,7 @@ def ensure_modpack_installed(modpack_config):
 
 
 def start_modpack(modpack_config):
+    global current_modpack_process, current_modpack_config
     print("Starting modpack")
     modpack_directory = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
     minecraft_command = minecraft_launcher_lib.command.get_minecraft_command(
@@ -106,7 +117,8 @@ def start_modpack(modpack_config):
                 "-XX:MaxTenuringThreshold=1"
             ]
         })
-    return subprocess.Popen(minecraft_command,
-                            cwd=modpack_directory,
-                            close_fds=True,
-                            creationflags=constants.DETACHED_PROCESS)
+    current_modpack_config = modpack_config
+    current_modpack_process = subprocess.Popen(minecraft_command,
+                                               cwd=modpack_directory,
+                                               close_fds=True,
+                                               creationflags=constants.DETACHED_PROCESS)

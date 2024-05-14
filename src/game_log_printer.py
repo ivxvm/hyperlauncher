@@ -3,9 +3,9 @@ import time
 from threading import Thread
 
 import constants
+import modpack
 
-latest_modpack_folder = None
-latest_game_process = None
+
 scheduled_timeout = 0
 
 
@@ -16,10 +16,12 @@ def game_log_printer_worker():
         if scheduled_timeout > 0:
             time.sleep(scheduled_timeout)
             scheduled_timeout = 0
-        if latest_game_process and latest_modpack_folder:
-            if latest_game_process.poll() == None:
+        modpack_process = modpack.current_modpack_process
+        modpack_folder = modpack.get_modpack_folder(modpack.current_modpack_config)
+        if modpack_process and modpack_folder:
+            if modpack_process.poll() == None:
                 if not log_file:
-                    log_file = open(f'{latest_modpack_folder}/logs/latest.log', 'r')
+                    log_file = open(f'{modpack_folder}/logs/latest.log', 'r')
                 while True:
                     line = log_file.readline()
                     if line:
@@ -30,7 +32,6 @@ def game_log_printer_worker():
                 if log_file:
                     log_file.close()
                     log_file = None
-
         time.sleep(constants.GAME_LOG_PRINTER_WORKER_INTERVAL)
 
 

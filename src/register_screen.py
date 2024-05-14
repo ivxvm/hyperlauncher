@@ -40,8 +40,9 @@ def handle_register_click():
                              verify=not constants.IS_LOCALHOST)
     status_code = response.status_code
     if status_code == 200:
-        settings.set_token(response.text)
         settings.set_username(username)
+        settings.set_token(response.text)
+        dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
         dpg.set_exit_callback(None)
         dpg.delete_item("tag:register")
         if git_installer.check_git_installed():

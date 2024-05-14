@@ -1,7 +1,10 @@
 import os
 import re
+import time
 import webbrowser
 import dearpygui.dearpygui as dpg
+
+from threading import Thread
 
 import constants
 import settings
@@ -9,7 +12,6 @@ import remote_config
 import modpack
 import skins
 import logger
-import discord_rpc
 import game_log_printer
 import login_screen
 
@@ -38,6 +40,10 @@ MIN_RAM_MAX_VALUE = 8096
 MAX_RAM_MIN_VALUE = 4096
 MAX_RAM_MAX_VALUE = 16384
 RAM_STEP = 512
+
+MODPACK_PROCESS_WATCHER_INTERVAL = 1
+
+main_screen_rendered_at_least_once = False
 
 
 def handle_selected_modpack_change():
@@ -76,23 +82,23 @@ def handle_logout():
     login_screen.render_login_screen()
 
 
-def handle_play():
-    modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
-    modpack_folder = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
-    skins_folder = f"{modpack_folder}/cachedImages/skins"
-    dpg.set_value("tag:main/log_header", True)
-    skins.sync_own_skin(username=settings.username,
-                        token=settings.token,
-                        skin_path=settings.skin_path,
-                        skins_folder=skins_folder)
-    skins.sync_skins(skins_folder=skins_folder)
-    modpack.ensure_modpack_installed(modpack_config)
-    game_process = modpack.start_modpack(modpack_config)
-    discord_rpc.latest_game_process = game_process
-    discord_rpc.latest_modpack_title = modpack_config['title'][settings.locale]
-    game_log_printer.scheduled_timeout = constants.GAME_LOG_PRINTER_PREDELAY
-    game_log_printer.latest_game_process = game_process
-    game_log_printer.latest_modpack_folder = modpack_folder
+def handle_play_kill():
+    modpack_process = modpack.current_modpack_process
+    if modpack_process and modpack_process.poll() == None:
+        modpack_process.kill()
+    else:
+        modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
+        modpack_folder = modpack.get_modpack_folder(modpack_config)
+        skins_folder = f"{modpack_folder}/cachedImages/skins"
+        dpg.set_value("tag:main/log_header", True)
+        skins.sync_own_skin(username=settings.username,
+                            token=settings.token,
+                            skin_path=settings.skin_path,
+                            skins_folder=skins_folder)
+        skins.sync_skins(skins_folder=skins_folder)
+        modpack.ensure_modpack_installed(modpack_config)
+        modpack.start_modpack(modpack_config)
+        game_log_printer.scheduled_timeout = constants.GAME_LOG_PRINTER_PREDELAY
 
 
 def render_news(news):
@@ -116,6 +122,9 @@ def short_path(len, path):
 
 
 def render_main_screen():
+    global main_screen_rendered_at_least_once
+    main_screen_rendered_at_least_once = True
+
     if not settings.selected_modpack:
         settings.set_selected_modpack(next(iter(remote_config.modpack_config_by_name)))
 
@@ -248,11 +257,13 @@ def render_main_screen():
         with dpg.group(tag="tag:main/bottom_buttons", horizontal=True):
             dpg.add_spacer(width=64)
             dpg.add_button(
+                tag="tag:main/play_kill_button",
                 label=localize("[Запуск]"),
                 width=116,
                 height=24,
-                callback=handle_play)
-            dpg.add_spacer(width=500)
+                callback=handle_play_kill)
+            dpg.add_spacer(tag="tag:main/play_kill_button_right_margin",
+                           width=500)
             discord_link = dpg.add_button(
                 label="[discord]",
                 width=120,
@@ -265,3 +276,25 @@ def render_main_screen():
                 callback=lambda: webbrowser.open(constants.GITHUB_URL))
             dpg.bind_item_theme(discord_link, "theme:hyperlink")
             dpg.bind_item_theme(github_link, "theme:hyperlink")
+
+
+def start_modpack_process_watcher():
+    def watcher():
+        while True:
+            if main_screen_rendered_at_least_once:
+                modpack_process = modpack.current_modpack_process
+                if dpg.does_alias_exist("tag:main/play_kill_button"):
+                    if modpack_process and modpack_process.poll() == None:
+                        dpg.set_item_label("tag:main/play_kill_button", localize("[Вимкнути]"))
+                        dpg.set_item_width("tag:main/play_kill_button", 146)
+                        dpg.set_item_width("tag:main/play_kill_button_right_margin", 470)
+                    else:
+                        dpg.set_item_label("tag:main/play_kill_button", localize("[Запуск]"))
+                        dpg.set_item_width("tag:main/play_kill_button", 116)
+                        dpg.set_item_width("tag:main/play_kill_button_right_margin", 500)
+            time.sleep(MODPACK_PROCESS_WATCHER_INTERVAL)
+    thread = Thread(target=watcher, daemon=True)
+    thread.start()
+
+
+start_modpack_process_watcher()
