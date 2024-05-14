@@ -16,3 +16,7 @@ cd hyperlauncher
 pip install -r requirements.txt --user
 python .\src\hyperlauncher.py
 ```
+
+## Підтримайте проєкт
+
+https://buymeacoffee.com/hypercube.in.ua
