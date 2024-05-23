@@ -7,6 +7,8 @@ import constants
 import settings
 import modpack
 
+from localization import localize
+
 RPC_STATE_NONE = "RPC_STATE_NONE"
 RPC_STATE_MENU = "RPC_STATE_MENU"
 RPC_STATE_GAME = "RPC_STATE_GAME"
@@ -31,10 +33,10 @@ def presence_worker():
             if process and process.poll() == None:
                 new_rpc_state = RPC_STATE_GAME
                 modpack_title = modpack.current_modpack_config["title"][settings.locale]
-                rpc_data["details"] = f'Грає в збірку "{modpack_title}"'
+                rpc_data["details"] = f'{localize("Грає в збірку")} "{modpack_title}"'
             else:
                 new_rpc_state = RPC_STATE_MENU
-                rpc_data["details"] = "В меню лаунчера"
+                rpc_data["details"] = localize("В меню лаунчера")
             if new_rpc_state != rpc_state:
                 rpc_data["start"] = int(time.time())
                 rpc_state = new_rpc_state
