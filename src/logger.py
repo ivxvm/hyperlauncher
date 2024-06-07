@@ -24,8 +24,7 @@ class DpgOutput():
                 dpg.set_y_scroll(
                     log_window_id, -1.0)
             except:
-                original_stdout.write(stripped_text)
-                original_stdout.write('\n')
+                pass
 
 
 sys.stdout = DpgOutput()

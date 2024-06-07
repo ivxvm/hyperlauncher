@@ -2,13 +2,7 @@ import dearpygui.dearpygui as dpg
 
 import constants
 import localization
-import main_screen
 import git_installer
-
-
-def handle_git_installed():
-    dpg.delete_item("tag:git_install")
-    main_screen.render_main_screen()
 
 
 def render_git_install_screen():
@@ -22,4 +16,4 @@ def render_git_install_screen():
                                           width=constants.WINDOW_WIDTH)
             dpg.bind_item_theme(error_button, "theme:error_text")
             y += 64
-    git_installer.download_and_install_git(callback=handle_git_installed)
+    git_installer.download_and_install_git()
