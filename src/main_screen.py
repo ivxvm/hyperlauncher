@@ -44,6 +44,7 @@ RAM_STEP = 512
 MODPACK_PROCESS_WATCHER_INTERVAL = 1
 
 main_screen_rendered_at_least_once = False
+is_ongoing_installation = False
 
 
 def handle_selected_modpack_change():
@@ -83,6 +84,7 @@ def handle_logout():
 
 
 def handle_play_kill():
+    global is_ongoing_installation
     modpack_process = modpack.current_modpack_process
     if modpack_process and modpack_process.poll() == None:
         modpack_process.kill()
@@ -91,6 +93,8 @@ def handle_play_kill():
         modpack_folder = modpack.get_modpack_folder(modpack_config)
         skins_folder = f"{modpack_folder}/cachedImages/skins"
         dpg.set_value("tag:main/log_header", True)
+        is_ongoing_installation = True
+        invalidate_play_button()
         skins.sync_own_skin(username=settings.username,
                             token=settings.token,
                             skin_path=settings.skin_path,
@@ -98,6 +102,7 @@ def handle_play_kill():
         skins.sync_skins(skins_folder=skins_folder)
         modpack.ensure_modpack_installed(modpack_config)
         modpack.start_modpack(modpack_config)
+        is_ongoing_installation = False
         game_log_printer.scheduled_timeout = constants.GAME_LOG_PRINTER_PREDELAY
 
 
@@ -278,20 +283,28 @@ def render_main_screen():
             dpg.bind_item_theme(github_link, "theme:hyperlink")
 
 
+def invalidate_play_button():
+    if dpg.does_alias_exist("tag:main/play_kill_button"):
+        modpack_process = modpack.current_modpack_process
+        if is_ongoing_installation:
+            dpg.set_item_label("tag:main/play_kill_button", "")
+            dpg.set_item_width("tag:main/play_kill_button", 1)
+            dpg.set_item_width("tag:main/play_kill_button_right_margin", 615)
+        elif modpack_process and modpack_process.poll() == None:
+            dpg.set_item_label("tag:main/play_kill_button", localize("[Вимкнути]"))
+            dpg.set_item_width("tag:main/play_kill_button", 146)
+            dpg.set_item_width("tag:main/play_kill_button_right_margin", 470)
+        else:
+            dpg.set_item_label("tag:main/play_kill_button", localize("[Запуск]"))
+            dpg.set_item_width("tag:main/play_kill_button", 116)
+            dpg.set_item_width("tag:main/play_kill_button_right_margin", 500)
+
+
 def start_modpack_process_watcher():
     def watcher():
         while True:
             if main_screen_rendered_at_least_once:
-                modpack_process = modpack.current_modpack_process
-                if dpg.does_alias_exist("tag:main/play_kill_button"):
-                    if modpack_process and modpack_process.poll() == None:
-                        dpg.set_item_label("tag:main/play_kill_button", localize("[Вимкнути]"))
-                        dpg.set_item_width("tag:main/play_kill_button", 146)
-                        dpg.set_item_width("tag:main/play_kill_button_right_margin", 470)
-                    else:
-                        dpg.set_item_label("tag:main/play_kill_button", localize("[Запуск]"))
-                        dpg.set_item_width("tag:main/play_kill_button", 116)
-                        dpg.set_item_width("tag:main/play_kill_button_right_margin", 500)
+                invalidate_play_button()
             time.sleep(MODPACK_PROCESS_WATCHER_INTERVAL)
     thread = Thread(target=watcher, daemon=True)
     thread.start()
