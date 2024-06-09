@@ -3,6 +3,7 @@ import dearpygui.dearpygui as dpg
 
 import validators
 import settings
+import remote_config
 import constants
 import login_screen
 import main_screen
@@ -42,6 +43,7 @@ def handle_register_click():
     if status_code == 200:
         settings.set_username(username)
         settings.set_token(response.text)
+        remote_config.invalidate_modpacks(username)
         dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
         dpg.set_exit_callback(None)
         dpg.delete_item("tag:register")

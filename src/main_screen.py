@@ -136,12 +136,14 @@ def render_main_screen():
     with dpg.group(tag="tag:main", parent="tag:window"):
         with dpg.group(horizontal=True):
             selected_modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
+            modpack_titles = remote_config.modpack_titles_by_locale[settings.locale]
             with dpg.group():
                 dpg.add_text("", indent=2)
                 dpg.add_listbox(
                     width=MODPACKS_LISTBOX_WIDTH,
                     tag="tag:main/selected_modpack",
-                    items=remote_config.modpack_titles_by_locale[settings.locale],
+                    items=modpack_titles,
+                    num_items=len(modpack_titles),
                     default_value=selected_modpack_config['title'][settings.locale],
                     callback=handle_selected_modpack_change)
             with dpg.tab_bar(tag="tag:main/modpack_tab_bar"):
