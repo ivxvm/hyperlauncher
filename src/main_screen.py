@@ -135,8 +135,11 @@ def render_main_screen():
 
     with dpg.group(tag="tag:main", parent="tag:window"):
         with dpg.group(horizontal=True):
-            selected_modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
             modpack_titles = remote_config.modpack_titles_by_locale[settings.locale]
+            selected_modpack_config = remote_config.modpack_config_by_name.get(
+                settings.selected_modpack,
+                remote_config.modpack_config_by_locale_and_title[settings.locale][modpack_titles[0]])
+
             with dpg.group():
                 dpg.add_text("", indent=2)
                 dpg.add_listbox(
