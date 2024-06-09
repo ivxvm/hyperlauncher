@@ -3,3 +3,10 @@
 /dist
 /trash
 hyperlauncher.spec
+
+bundle_nuitka.sh
+hyperlauncher.build/
+hyperlauncher.dist/
+hyperlauncher.onefile-build/
+
+Output/
