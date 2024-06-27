@@ -8,8 +8,9 @@ import constants
 import settings
 
 
-current_modpack_process = None
 current_modpack_config = None
+current_modpack_process = None
+current_modpack_process_log = None
 
 
 ###############################################################################
@@ -80,7 +81,7 @@ def ensure_modpack_installed(modpack_config):
 
 
 def start_modpack(modpack_config):
-    global current_modpack_process, current_modpack_config
+    global current_modpack_config, current_modpack_process, current_modpack_process_log
     print("Starting modpack")
     modpack_directory = os.path.expanduser(settings.working_folder + "/" + modpack_config["directory_name"])
     minecraft_command = minecraft_launcher_lib.command.get_minecraft_command(
@@ -118,7 +119,12 @@ def start_modpack(modpack_config):
             ]
         })
     current_modpack_config = modpack_config
+    if current_modpack_process_log != None:
+        current_modpack_process_log.close()
+    current_modpack_process_log = open(f'{modpack_directory}/logs/process.log', 'w')
     current_modpack_process = subprocess.Popen(minecraft_command,
                                                cwd=modpack_directory,
                                                close_fds=True,
+                                               stdout=current_modpack_process_log,
+                                               stderr=current_modpack_process_log,
                                                creationflags=constants.DETACHED_PROCESS)
