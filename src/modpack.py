@@ -77,7 +77,13 @@ def ensure_modpack_installed(modpack_config):
     if len(repo.remotes) == 0:
         repo.create_remote("origin", modpack_config["repository_url"])
     print("Syncing modpack files")
-    repo.git.pull("origin", "main", "--rebase", "--autostash")
+    try:
+        repo.git.add(".")
+        repo.git.commit("-m", "Temp")
+        repo.git.pull("origin", "main", "--rebase", "--autostash", "-X", "theirs")
+        repo.git.reset("--soft", "HEAD~1")
+    except Exception as e:
+        print(e)
 
 
 def start_modpack(modpack_config):
