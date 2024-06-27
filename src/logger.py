@@ -11,7 +11,7 @@ class DpgOutput():
     def __getattr__(self, attr):
         return getattr(original_stdout, attr)
 
-    def flush():
+    def flush(self):
         original_stdout.flush()
 
     def write(self, text: str):
