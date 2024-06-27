@@ -40,11 +40,13 @@ def global_cleaner(name):
 username = load_utf8_value("username")
 working_folder = load_utf8_value("working_folder") or "~"
 locale = load_utf8_value("locale")
+debug_mode = load_utf8_value("debug_mode")
 
 set_username = global_setter("username")
 set_working_folder = global_setter("working_folder")
 set_locale = global_setter("locale")
 clear_locale = global_cleaner("locale")
+set_debug_mode = global_setter("debug_mode")
 
 
 ###############################################################################

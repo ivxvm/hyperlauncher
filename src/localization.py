@@ -54,7 +54,8 @@ ua_to_en = {
     "Зачекайте, згодом буде завантажено і запущено його інсталятор.": "Please wait, the installer will be downloaded and launched soon.",
     "Перезапустіть лаунчер після завершення інсталяції.": "Please restart the launcher after the installation is completed.",
     "Грає в збірку": "Playing",
-    "В меню лаунчера": "In launcher menu"
+    "В меню лаунчера": "In launcher menu",
+    "Дебаг режим": "Debug mode"
 }
 
 

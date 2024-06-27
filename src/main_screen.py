@@ -75,7 +75,14 @@ def handle_working_folder_selected(_, data):
 def handle_locale_selected(_, data):
     settings.set_locale(localization.locale_name_by_title[data])
     dpg.delete_item("tag:main")
-    render_main_screen()
+    render_main_screen(settings_expanded=True)
+
+
+def handle_debug_mode_toggled(_, data):
+    settings.set_debug_mode(str(data))
+    remote_config.invalidate_modpacks()
+    dpg.delete_item("tag:main")
+    render_main_screen(settings_expanded=True)
 
 
 def handle_logout():
@@ -89,7 +96,9 @@ def handle_play_kill():
     if modpack_process and modpack_process.poll() == None:
         modpack_process.kill()
     else:
-        modpack_config = remote_config.modpack_config_by_name[settings.selected_modpack]
+        modpack_config = remote_config.modpack_config_by_name.get(
+            settings.selected_modpack,
+            next(iter(remote_config.modpack_config_by_name.values())))
         modpack_folder = modpack.get_modpack_folder(modpack_config)
         skins_folder = f"{modpack_folder}/cachedImages/skins"
         dpg.set_value("tag:main/log_header", True)
@@ -126,7 +135,7 @@ def short_path(len, path):
             return chunk
 
 
-def render_main_screen():
+def render_main_screen(settings_expanded=False):
     global main_screen_rendered_at_least_once
     main_screen_rendered_at_least_once = True
 
@@ -199,7 +208,7 @@ def render_main_screen():
                                          callback=handle_skin_selected):
                         dpg.add_file_extension(".png")
 
-            with dpg.collapsing_header(label=localize("Загальні налаштування"), default_open=False):
+            with dpg.collapsing_header(label=localize("Загальні налаштування"), default_open=settings_expanded):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
                     dpg.add_input_text(default_value=localize("Робоча папка"),
                                        readonly=True,
@@ -227,6 +236,12 @@ def render_main_screen():
                                   default_value=localization.locale_title_by_name[settings.locale],
                                   width=200,
                                   callback=handle_locale_selected)
+                with dpg.group(horizontal=True, indent=SETTINGS_INDENT):
+                    dpg.add_input_text(default_value=localize("Дебаг режим"),
+                                       readonly=True,
+                                       width=GENERAL_SETTINGS_LABEL_WIDTH)
+                    dpg.add_checkbox(default_value=settings.debug_mode == "True",
+                                     callback=handle_debug_mode_toggled)
 
             with dpg.collapsing_header(label=localize("Налаштування модпаку"), default_open=False):
                 with dpg.group(horizontal=True, indent=SETTINGS_INDENT):

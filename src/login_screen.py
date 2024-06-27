@@ -39,7 +39,7 @@ def handle_login_click():
         settings.set_username(username)
         settings.reload_user_settings()
         settings.set_token(response.text)
-        remote_config.invalidate_modpacks(username)
+        remote_config.invalidate_modpacks()
         dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
         dpg.set_exit_callback(None)
         dpg.delete_item("tag:login")

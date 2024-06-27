@@ -91,7 +91,7 @@ def main():
             dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")
             settings.reload_user_settings()
             settings.set_token(login_response.text)
-            remote_config.invalidate_modpacks(settings.username)
+            remote_config.invalidate_modpacks()
 
         if settings.locale:
             if login_response.status_code == 200:
