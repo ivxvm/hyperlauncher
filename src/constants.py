@@ -1,6 +1,7 @@
 import dearpygui.dearpygui as dpg
 
-LAUCNHER_CONFIG_FILE = "~/hyperlauncher.conf"
+LAUNCHER_FOLDER = "~/hyperlauncher"
+OLD_LAUNCHER_CONFIG_FILE = "~/hyperlauncher.conf"
 MODPACKS_CONFIG_URL = "https://raw.githubusercontent.com/ivxvm/hypercube-modpacks/main/hypercube-modpacks.json"
 
 AUTH_SERVER_URL = "https://hypercube.in.ua:8443"
@@ -11,6 +12,10 @@ GIT_WATCHER_INTERVAL = 1
 
 GITHUB_URL = "https://github.com/ivxvm/hyperlauncher"
 DISCORD_URL = "https://discord.com/invite/4dv9qGebhW"
+
+FONT_URL = "https://github.com/ivxvm/hyperlauncher/raw/main/src/assets/Minecraft_1.1.ttf"
+ICON_URL = "https://github.com/ivxvm/hyperlauncher/raw/main/src/assets/icon.ico"
+LOGO_URL = "https://raw.githubusercontent.com/ivxvm/hyperlauncher/main/src/assets/logo.png"
 
 DISCORD_CLIENT_ID = "1238431431437582397"
 

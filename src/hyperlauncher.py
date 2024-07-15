@@ -1,5 +1,4 @@
-from os import path
-
+import os
 import ctypes
 import requests
 import dearpygui.dearpygui as dpg
@@ -13,13 +12,38 @@ import login_screen
 import main_screen
 import git_install_screen
 import git_installer
+import utils
 
-FONT_PATH = path.join(path.dirname(__file__), "assets/Minecraft_1.1.ttf")
-LOGO_PATH = path.join(path.dirname(__file__), "assets/logo.png")
-ICON_PATH = path.join(path.dirname(__file__), "assets/icon.ico")
+FONT_PATH = os.path.expanduser(constants.LAUNCHER_FOLDER + "/Minecraft_1.1.ttf")
+LOGO_PATH = os.path.expanduser(constants.LAUNCHER_FOLDER + "/logo.png")
+ICON_PATH = os.path.expanduser(constants.LAUNCHER_FOLDER + "/icon.ico")
+
+
+def invalidate_paths():
+    launcher_folder = os.path.expanduser(constants.LAUNCHER_FOLDER)
+    os.makedirs(launcher_folder, exist_ok=True)
+    old_settings_file = os.path.expanduser(constants.OLD_LAUNCHER_CONFIG_FILE)
+    if os.path.isfile(old_settings_file):
+        new_settings_file = os.path.expanduser(constants.LAUNCHER_FOLDER + "/hyperlauncher.conf")
+        os.replace(old_settings_file, new_settings_file)
+        settings.reload_settings()
+        settings.reload_user_settings()
+        settings.reload_modpack_settings()
+
+
+def invalidate_assets():
+    if not os.path.isfile(FONT_PATH):
+        utils.download_file(constants.FONT_URL, FONT_PATH)
+    if not os.path.isfile(LOGO_PATH):
+        utils.download_file(constants.LOGO_URL, LOGO_PATH)
+    if not os.path.isfile(ICON_PATH):
+        utils.download_file(constants.ICON_URL, ICON_PATH)
 
 
 def main():
+    invalidate_paths()
+    invalidate_assets()
+
     user32 = ctypes.windll.user32
     screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 

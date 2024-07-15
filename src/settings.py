@@ -7,8 +7,8 @@ import constants
 
 ###############################################################################
 
-
-settings_file = EasySettings(os.path.expanduser(constants.LAUCNHER_CONFIG_FILE))
+os.makedirs(os.path.expanduser(constants.LAUNCHER_FOLDER), exist_ok=True)
+settings_file = EasySettings(os.path.expanduser(constants.LAUNCHER_FOLDER + "/hyperlauncher.conf"))
 
 
 def save_utf8_value(key, value):
@@ -41,6 +41,16 @@ username = load_utf8_value("username")
 working_folder = load_utf8_value("working_folder") or "~"
 locale = load_utf8_value("locale")
 debug_mode = load_utf8_value("debug_mode")
+
+
+def reload_settings():
+    global settings_file, username, working_folder, locale, debug_mode
+    settings_file = EasySettings(os.path.expanduser(constants.LAUNCHER_FOLDER + "/hyperlauncher.conf"))
+    username = load_utf8_value("username")
+    working_folder = load_utf8_value("working_folder") or "~"
+    locale = load_utf8_value("locale")
+    debug_mode = load_utf8_value("debug_mode")
+
 
 set_username = global_setter("username")
 set_working_folder = global_setter("working_folder")

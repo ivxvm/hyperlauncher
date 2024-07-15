@@ -1,1 +1,1 @@
-python -m PyInstaller .\src\hyperlauncher.py --noconsole --runtime-hook ".\src\runtime_hook.py" --add-data=".\src\assets\Minecraft_1.1.ttf:assets" --add-data=".\src\assets\logo.png:assets" --add-data=".\src\assets\icon.ico:assets" --icon=".\src\assets\icon.ico"
+python -m PyInstaller .\src\hyperlauncher.py --noconsole --runtime-hook ".\src\runtime_hook.py" --icon=".\src\assets\icon.ico"
