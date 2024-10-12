@@ -1,8 +1,8 @@
 import os
-import ctypes
 import requests
 import dearpygui.dearpygui as dpg
 import discord_rpc as _
+import screeninfo
 
 import settings
 import remote_config
@@ -44,8 +44,11 @@ def main():
     invalidate_paths()
     invalidate_assets()
 
-    user32 = ctypes.windll.user32
-    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    screensize = 1920, 1080
+
+    for m in screeninfo.get_monitors():
+        if m.is_primary:
+            screensize = m.width, m.height
 
     dpg.create_context()
     dpg.create_viewport(title="Hyperlauncher",

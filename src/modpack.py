@@ -1,4 +1,5 @@
 import os
+import sys
 import uuid
 import subprocess
 import git
@@ -68,6 +69,9 @@ def ensure_modpack_installed(modpack_config):
             if current_client_version == modpack_config["client_version"]:
                 should_download_client = False
     if should_download_client:
+        if len(minecraft_launcher_lib.java_utils.find_system_java_versions()) == 0:
+            print("Java not found! Please install Java version 17 and restart the launcher.")
+            return False
         print(f'Installing minecraft client {modpack_config["client_version"]}')
         minecraft_launcher_lib.forge.install_forge_version(
             modpack_config["client_version"], modpack_folder, callback=PROGRESS_CB)
@@ -86,6 +90,8 @@ def ensure_modpack_installed(modpack_config):
         repo.git.reset("--soft", "HEAD~1")
     except Exception as e:
         print(e)
+        return False
+    return True
 
 
 def start_modpack(modpack_config):
@@ -135,4 +141,4 @@ def start_modpack(modpack_config):
                                                close_fds=True,
                                                stdout=current_modpack_process_log,
                                                stderr=current_modpack_process_log,
-                                               creationflags=constants.DETACHED_PROCESS)
+                                               creationflags=constants.DETACHED_PROCESS if sys.platform == 'win32' else 0)

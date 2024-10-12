@@ -109,10 +109,10 @@ def handle_play_kill():
                             skin_path=settings.skin_path,
                             skins_folder=skins_folder)
         skins.sync_skins(skins_folder=skins_folder)
-        modpack.ensure_modpack_installed(modpack_config)
-        modpack.start_modpack(modpack_config)
+        if modpack.ensure_modpack_installed(modpack_config):
+            modpack.start_modpack(modpack_config)
+            game_log_printer.scheduled_timeout = constants.GAME_LOG_PRINTER_PREDELAY
         is_ongoing_installation = False
-        game_log_printer.scheduled_timeout = constants.GAME_LOG_PRINTER_PREDELAY
 
 
 def render_news(news):
