@@ -85,7 +85,10 @@ def ensure_modpack_installed(modpack_config):
         repo.git.add(".")
         repo.git.config("user.name", "hyperlauncher")
         repo.git.config("user.email", "hyperlauncher@hypercube.in.ua")
-        repo.git.commit("-m", "Temp")
+        try:
+            repo.git.commit("-m", "Temp")
+        except:
+            pass
         repo.git.pull("origin", "main", "--rebase", "--autostash", "-X", "theirs")
         repo.git.reset("--soft", "HEAD~1")
     except Exception as e:
