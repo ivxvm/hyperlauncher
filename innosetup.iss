@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Hyperlauncher"
-#define MyAppVersion "1.8"
+#define MyAppVersion "1.9"
 #define MyAppPublisher "Hypercube"
 #define MyAppURL "https://github.com/ivxvm/hyperlauncher"
 #define MyAppExeName "hyperlauncher.exe"
