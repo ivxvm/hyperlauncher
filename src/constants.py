@@ -4,8 +4,9 @@ LAUNCHER_FOLDER = "~/hyperlauncher"
 OLD_LAUNCHER_CONFIG_FILE = "~/hyperlauncher.conf"
 MODPACKS_CONFIG_URL = "https://raw.githubusercontent.com/ivxvm/hypercube-modpacks/main/hypercube-modpacks.json"
 
-AUTH_SERVER_URL = "https://hypercube.in.ua:8443"
+AUTH_SERVER_URL = "https://188.132.234.41:8443"
 IS_LOCALHOST = "localhost" in AUTH_SERVER_URL
+VERIFY_CERT = False
 
 GIT_WINDOWS_URL = "https://github.com/git-for-windows/git/releases/download/v2.45.0.windows.1/Git-2.45.0-64-bit.exe"
 GIT_WATCHER_INTERVAL = 1

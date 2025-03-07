@@ -38,7 +38,7 @@ def handle_register_click():
     response = requests.post(f'{constants.AUTH_SERVER_URL}/register',
                              json={"username": username,
                                    "password": password},
-                             verify=not constants.IS_LOCALHOST)
+                             verify=constants.VERIFY_CERT)
     status_code = response.status_code
     if status_code == 200:
         settings.set_username(username)

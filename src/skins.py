@@ -18,7 +18,7 @@ def sync_own_skin(username, token, skin_path, skins_folder):
     checksum = get_file_md5(skin_path)
     response = requests.get(
         f'{constants.AUTH_SERVER_URL}/skin-needs-upload?username={username}&checksum={checksum}',
-        verify=not constants.IS_LOCALHOST)
+        verify=constants.VERIFY_CERT)
     status_code = response.status_code
     if status_code == 200:
         skin_needs_upload = response.json()
@@ -27,7 +27,7 @@ def sync_own_skin(username, token, skin_path, skins_folder):
             response = requests.post(f'{constants.AUTH_SERVER_URL}/skin',
                                      files={"skin": open(skin_path, 'rb')},
                                      headers={"Authorization": token},
-                                     verify=not constants.IS_LOCALHOST)
+                                     verify=constants.VERIFY_CERT)
             status_code = response.status_code
             if status_code != 200:
                 print(f"Failed to upload skin, status code: {status_code}")
@@ -38,7 +38,7 @@ def sync_own_skin(username, token, skin_path, skins_folder):
 def sync_skins(skins_folder):
     print("Syncing remote skins")
     response = requests.get(f'{constants.AUTH_SERVER_URL}/skins',
-                            verify=not constants.IS_LOCALHOST)
+                            verify=constants.VERIFY_CERT)
     status_code = response.status_code
     if status_code == 200:
         for entry in response.json():

@@ -112,7 +112,7 @@ def main():
         login_response = requests.post(f'{constants.AUTH_SERVER_URL}/login',
                                        json={"username": settings.username,
                                              "token": settings.token},
-                                       verify=not constants.IS_LOCALHOST)
+                                       verify=constants.VERIFY_CERT)
 
         if login_response.status_code == 200:
             dpg.set_viewport_title(f"Hyperlauncher [{settings.username}]")

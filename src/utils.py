@@ -5,7 +5,7 @@ import constants
 
 
 def download_file(url, path):
-    with requests.get(url, stream=True, verify=not constants.IS_LOCALHOST) as r:
+    with requests.get(url, stream=True, verify=constants.VERIFY_CERT) as r:
         r.raise_for_status()
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, 'wb') as f:
