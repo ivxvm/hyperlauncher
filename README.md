@@ -1,6 +1,6 @@
 # Hyperlauncher
 
-Лаунчер для майнкрафт серверу [Гіперкуб](https://hypercube.in.ua/).
+Лаунчер для майнкрафт серверу [Гіперкуб](https://discord.gg/4dv9qGebhW).
 
 ## Використання
 
@@ -16,7 +16,3 @@ cd hyperlauncher
 pip install -r requirements.txt --user
 python .\src\hyperlauncher.py
 ```
-
-## Підтримайте проєкт
-
-https://buymeacoffee.com/hypercube.in.ua
